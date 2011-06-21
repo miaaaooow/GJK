@@ -44,7 +44,7 @@ public class Scene extends JFrame implements Runnable {
 	private final static int POINT_SIZE 	= 10;
 	private final static int MAX_POINTS_NUMBER = 100;
 	
-	private final static int timeFrame = 10;
+	private final static int FRAME_TIME = 1000;
 	
 	private final static String FINALIZE_OBJECT = "FIN OBJ";
 	private final static String PLAY_MOTION = "PLAY";
@@ -70,7 +70,6 @@ public class Scene extends JFrame implements Runnable {
 	
 	private int pointIndex; // the points index to be filled
 	private int bodiesIndex;
-	private boolean movement;
 	
 	
 	public Scene() {
@@ -78,7 +77,6 @@ public class Scene extends JFrame implements Runnable {
 		setLocation(150, 100);
 		pointIndex = 0;	 
 		bodiesIndex = 0;
-		movement = false;
 		
 		addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent me) { 
@@ -110,15 +108,16 @@ public class Scene extends JFrame implements Runnable {
 	
 	
 	public void finalizeObject(String object){
-		int dX = 120;
-		int dY = 120;
-		try {
-			dX = Integer.parseInt(entryX.getSelectedText());
-			dY = Integer.parseInt(entryY.getSelectedText());
-		} catch (NumberFormatException nfe) {
-			dX = 120; 
-			dY = 120;
-		}
+		int dX = 12;
+		int dY = 12;
+		/** @TODO - fix form **/ 
+//		try {
+//			dX = Integer.parseInt(entryX.getSelectedText());
+//			dY = Integer.parseInt(entryY.getSelectedText());
+//		} catch (NumberFormatException nfe) {
+//			dX = 120; 
+//			dY = 120;
+//		}
 		// CONVEX HULL
 		MovableObject body = new MovableObject(points, dX, dY, colors[bodiesIndex % colors.length]);
 		bodies.add(body);
@@ -202,7 +201,7 @@ public class Scene extends JFrame implements Runnable {
 	            } else if (action.equals(CLEAR_SCENE)) {
 	            	clearScreen();
 	            } else if (action.equals(PAUSE)) {
-	            	thread.interrupt();
+	            	thread.stop();          
 	            }
 			}
 		};		
@@ -259,7 +258,7 @@ public class Scene extends JFrame implements Runnable {
 				drawMovableObject(mo);
 			}
 			try {
-				Thread.sleep(1700);
+				Thread.sleep(FRAME_TIME);
 			} catch (InterruptedException ie) {
 				ie.printStackTrace();
 			}

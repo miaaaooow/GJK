@@ -16,8 +16,12 @@ public class AlgTools {
 	 * @return an array of the convex hull points
 	 */
 	
-	public Point [] findConvexHull(Point [] points) {
-		int size = points.length;
+	public static Point [] findConvexHull(Point [] points) {
+		int size = 0;
+		while (points[size] != null) {
+			size++;
+		}
+		
 		if (size < 3) {
 			return points;
 		} 

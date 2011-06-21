@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import algorithm.AlgTools;
+
 import ui.Scene;
 
 /**
@@ -28,13 +30,15 @@ public class MovableObject {
 	private Color color;
 	
 	public ArrayList<Point> points;
+
 	
 	public MovableObject (Point [] pointsArr, int dX, int dY, Color color) {
+		Point [] temp = AlgTools.findConvexHull(pointsArr);
 		ArrayList<Point> p = new ArrayList<Point>();
 		int index = 0;
-		int len = pointsArr.length;
-		while (index < len && pointsArr[index] != null) {
-			p.add(pointsArr[index++]);
+		int len = temp.length;
+		while (index < len && temp[index] != null) {
+			p.add(temp[index++]);
 		}
 		
 		if (color != null)
@@ -50,11 +54,6 @@ public class MovableObject {
 	}
 	
 	
-	public MovableObject (ArrayList<Point> points, int dX, int dY, Point limit) {
-		this.points = points;
-		this.deltaX = dX;
-		this.deltaY = dY;	
-	}
 	
 	public ArrayList<Point> getPoints() {
 		return this.points;
@@ -72,25 +71,22 @@ public class MovableObject {
 		deltaY = deltaY * (-1);
 	}
 
-	public void initialMinMax() {
-		Iterator<Point> it = points.iterator();
-		while (it.hasNext()) {
-			Point p = it.next();
-			if (p.x < minX) minX = p.x; 
-			if (p.x > maxX) maxX = p.x;
-			if (p.y < minY) minY = p.y;
-			if (p.y > maxY) maxY = p.y;
-		}
+	private void initializeMinMax() {
+		minX = Integer.MAX_VALUE;
+		minY = Integer.MAX_VALUE;
+		maxX = Integer.MIN_VALUE;
+		maxY = Integer.MIN_VALUE;
 	}
 	
 	/**
 	 * Recalculates the object's position on the scene
 	 */
 	public void move() {
-		ArrayList<Point> newPoints = new ArrayList<Point>();
+		initializeMinMax();
 		Iterator<Point> it = points.iterator();
+		Point p = null;
 		while (it.hasNext()) {
-			Point p = it.next();
+			p = it.next();
 			p.x += deltaX;
 			p.y += deltaY;
 			if (p.x < minX) 
@@ -101,9 +97,13 @@ public class MovableObject {
 				minY = p.y;
 			if (p.y > maxY) 
 				maxY = p.y;
-			newPoints.add(p);
 		}	
-		points = newPoints;
+		// This is not very beautiful but the first and the last point in the convex hull are the same, 
+		// which makes some tricks easy, in the price of the tiny trick.
+		if (p != null) {
+			p.x -= deltaX;
+			p.y -= deltaY;
+		}
 		checkForDirectionUpdates();
 	}
 	
@@ -111,9 +111,9 @@ public class MovableObject {
 	 * Prevents the object from going out of the scene
 	 */
 	private void checkForDirectionUpdates () {
-		if (minX + 2 * deltaX < 0 || maxX + 2 * deltaX > limitX)
+		if (minX + deltaX < 0 || maxX + deltaX > limitX)
 			turnX();
-		if (minY + 2 * deltaY < 0 || maxY + 2 * deltaY > limitY) {
+		if (minY + deltaY < 0 || maxY + deltaY > limitY) {
 			turnY();
 		}
 	}

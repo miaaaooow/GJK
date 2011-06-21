@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import algorithm.AlgTools;
+import algorithm.ConvexHull;
 
 import ui.Scene;
 
@@ -33,7 +33,7 @@ public class MovableObject {
 
 	
 	public MovableObject (Point [] pointsArr, int dX, int dY, Color color) {
-		Point [] temp = AlgTools.findConvexHull(pointsArr);
+		Point [] temp = ConvexHull.findConvexHull(pointsArr);
 		ArrayList<Point> p = new ArrayList<Point>();
 		int index = 0;
 		int len = temp.length;

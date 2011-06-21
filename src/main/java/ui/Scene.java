@@ -17,6 +17,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -31,8 +33,9 @@ import geomobjects.MovableObject;
 import geomobjects.Point;
 
 
-public class Scene extends JFrame{
-
+public class Scene extends JFrame implements Runnable {
+	
+	/** CONSTANTS **/
 	private static final long serialVersionUID = 1L;
 	
 	public final static int BOARDX 		= 1000;
@@ -50,6 +53,8 @@ public class Scene extends JFrame{
 	private final static Color [] colors = 
 			{Color.BLUE, Color.GREEN, Color.RED, Color.BLACK, Color.PINK, Color.ORANGE} ;
 
+	
+	/** private fields **/
 	private Graphics background;
 	private Image 	 backbuffer;
 	private JPanel   buttons;
@@ -61,10 +66,12 @@ public class Scene extends JFrame{
 	
 	private Point [] points = new Point [MAX_POINTS_NUMBER];
 	private ArrayList<MovableObject> bodies = new ArrayList<MovableObject>();
+	private Thread thread;
 	
 	private int pointIndex; // the points index to be filled
 	private int bodiesIndex;
 	private boolean movement;
+	
 	
 	public Scene() {
 		super("Алгоритъм GJK");
@@ -89,7 +96,12 @@ public class Scene extends JFrame{
 	        }	            
 		});
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    addWindowListener(new WindowAdapter() {
+	        public void windowClosing(WindowEvent e) {
+	          System.exit(0);
+	        }
+	      });
+	    
 		setSize(BOARDX, BOARDY + BUTTONY);	
 		setVisible(true);
 		setFocusable(true);
@@ -100,13 +112,13 @@ public class Scene extends JFrame{
 	public void finalizeObject(String object){
 		int dX = 120;
 		int dY = 120;
-//		try {
-//			dX = Integer.parseInt(entryX.getSelectedText());
-//			dY = Integer.parseInt(entryY.getSelectedText());
-//		} catch (NumberFormatException nfe) {
-//			dX = 120; 
-//			dY = 120;
-//		}
+		try {
+			dX = Integer.parseInt(entryX.getSelectedText());
+			dY = Integer.parseInt(entryY.getSelectedText());
+		} catch (NumberFormatException nfe) {
+			dX = 120; 
+			dY = 120;
+		}
 		// CONVEX HULL
 		MovableObject body = new MovableObject(points, dX, dY, colors[bodiesIndex % colors.length]);
 		bodies.add(body);
@@ -115,29 +127,7 @@ public class Scene extends JFrame{
 	    bodiesIndex++;
 	}
 	
-	public void performMovement() {
-		movement = true;
-		 
-		while (movement) {
-			Iterator<MovableObject> it = bodies.iterator();
-			while (it.hasNext()) {
-				MovableObject mo = it.next();
-				System.out.println(mo.toString());
-				mo.move();
-				drawMovableObject(mo);
-			}
-//			try {
-//				Thread.sleep(1700);
-//			} catch (InterruptedException ie) {
-//				ie.printStackTrace();
-//			}
-			redraw();
-		}		
-	}
 	
-	public void pause () {
-		movement = false;
-	}
 	
 	private void drawMovableObject(MovableObject mo) {
 		background.setColor(mo.getColor());
@@ -193,6 +183,8 @@ public class Scene extends JFrame{
 		pane.add(buttons);
 		pane.add(scene);
 		
+		thread = new Thread(this);
+		
 		startMode = false;
 	}
 	
@@ -206,11 +198,11 @@ public class Scene extends JFrame{
 				if (action.equals(FINALIZE_OBJECT) ) {
 					finalizeObject(action);   	
 				} else if (action.equals(PLAY_MOTION)) {
-					performMovement();
+					thread.start();
 	            } else if (action.equals(CLEAR_SCENE)) {
 	            	clearScreen();
 	            } else if (action.equals(PAUSE)) {
-	            	pause();
+	            	thread.interrupt();
 	            }
 			}
 		};		
@@ -242,6 +234,39 @@ public class Scene extends JFrame{
 	
 	public static void main(String[] args) {
 		new Scene();	
+	}
+
+	public void start() {
+		thread = new Thread(this);
+	    thread.setPriority(Thread.MIN_PRIORITY);
+	    thread.start();
+	}
+
+	public void stop() {
+	    if (thread != null)
+	      thread.interrupt();
+	    thread = null;
+	}
+
+	public void run() {
+	    Thread me = Thread.currentThread();
+	    while (thread == me) {
+	    	Iterator<MovableObject> it = bodies.iterator();
+			while (it.hasNext()) {
+				MovableObject mo = it.next();
+				System.out.println(mo.toString());
+				mo.move();
+				drawMovableObject(mo);
+			}
+			try {
+				Thread.sleep(1700);
+			} catch (InterruptedException ie) {
+				ie.printStackTrace();
+			}
+			redraw();
+			repaint();
+	    }
+	    thread = null;
 	}
 }
 

@@ -111,9 +111,9 @@ public class MovableObject {
 	 * Prevents the object from going out of the scene
 	 */
 	private void checkForDirectionUpdates () {
-		if (minX + deltaX < 0 || maxX + deltaX > limitX)
+		if (minX + 2 * deltaX < 0 || maxX + 2 * deltaX > limitX)
 			turnX();
-		if (minY + deltaY < 0 || maxY + deltaY > limitY) {
+		if (minY + 2 * deltaY < 0 || maxY + 2 * deltaY > limitY) {
 			turnY();
 		}
 	}

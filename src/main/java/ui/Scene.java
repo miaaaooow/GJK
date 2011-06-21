@@ -75,19 +75,18 @@ public class Scene extends JFrame{
 		
 		addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent me) { 
-	
-		            int x1 = me.getX();
-		            int y1 = me.getY() - BUTTONY;     
-		            
-		    	    background.setColor(colors[bodiesIndex % colors.length]);
-	            	Point p = new Point(x1, y1);
-	            	background.fillRect(x1 - POINT_SIZE/2, y1 - POINT_SIZE/2, POINT_SIZE, POINT_SIZE);	            	
-	            	points[pointIndex] = p;            
-	            	pointIndex++;
+	            int x1 = me.getX();
+	            int y1 = me.getY() - BUTTONY;     
 	            
-	            	repaint();
-	            	me.consume();
-	            }	            
+	    	    background.setColor(colors[bodiesIndex % colors.length]);
+            	Point p = new Point(x1, y1);
+            	background.fillRect(x1 - POINT_SIZE/2, y1 - POINT_SIZE/2, POINT_SIZE, POINT_SIZE);	            	
+            	points[pointIndex] = p;            
+            	pointIndex++;
+            
+            	repaint();
+            	me.consume();
+	        }	            
 		});
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -99,15 +98,15 @@ public class Scene extends JFrame{
 	
 	
 	public void finalizeObject(String object){
-		int dX = 0;
-		int dY = 0;
-		try {
-			dX = Integer.parseInt(entryX.getSelectedText());
-			dY = Integer.parseInt(entryY.getSelectedText());
-		} catch (NumberFormatException nfe) {
-			dX = 0; 
-			dY = 0;
-		}
+		int dX = 120;
+		int dY = 120;
+//		try {
+//			dX = Integer.parseInt(entryX.getSelectedText());
+//			dY = Integer.parseInt(entryY.getSelectedText());
+//		} catch (NumberFormatException nfe) {
+//			dX = 120; 
+//			dY = 120;
+//		}
 		// CONVEX HULL
 		MovableObject body = new MovableObject(points, dX, dY, colors[bodiesIndex % colors.length]);
 		bodies.add(body);
@@ -123,20 +122,40 @@ public class Scene extends JFrame{
 			Iterator<MovableObject> it = bodies.iterator();
 			while (it.hasNext()) {
 				MovableObject mo = it.next();
+				System.out.println(mo.toString());
 				mo.move();
 				drawMovableObject(mo);
 			}
-			try {
-				Thread.sleep(5);
-			} catch (InterruptedException ie) {
-				ie.printStackTrace();
-			}
+//			try {
+//				Thread.sleep(1700);
+//			} catch (InterruptedException ie) {
+//				ie.printStackTrace();
+//			}
 			redraw();
 		}		
 	}
 	
+	public void pause () {
+		movement = false;
+	}
+	
 	private void drawMovableObject(MovableObject mo) {
-		
+		background.setColor(mo.getColor());
+		ArrayList<Point> ap = mo.points;
+		Iterator<Point> it = ap.iterator();
+		Point prev = null;
+		if (it.hasNext()) {
+			Point first = it.next();
+			background.fillRect(first.x - POINT_SIZE/2, first.y + BUTTONY - POINT_SIZE/2, POINT_SIZE, POINT_SIZE);
+			prev = first;
+		}		
+		while (it.hasNext()) {
+			Point some = it.next();
+			background.fillRect(some.x - POINT_SIZE/2, some.y + BUTTONY - POINT_SIZE/2, POINT_SIZE, POINT_SIZE);	 
+			background.drawLine(prev.x, prev.y + BUTTONY, some.x, some.y + BUTTONY);
+			prev = some;
+		}
+		System.out.println("draw movable end");
 	}
 	
 	
@@ -149,6 +168,11 @@ public class Scene extends JFrame{
 	    bodies = new ArrayList<MovableObject>();	
 	}
 
+	protected void redraw() {
+	    background.setColor(Color.WHITE);
+	    background.fillRect(0, 0, BOARDX, BOARDY + BUTTONY);
+	    background.setColor(Color.BLACK);
+	}
 	
 	public void paint(Graphics g) {
 	    if (startMode)
@@ -158,8 +182,7 @@ public class Scene extends JFrame{
 	
 	
 	private void initGraphics (Container pane) {
-		pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
-		
+		pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));		
 		backbuffer = createImage(BOARDX, BOARDY);
 		background = backbuffer.getGraphics();
 		redraw();
@@ -173,17 +196,10 @@ public class Scene extends JFrame{
 		startMode = false;
 	}
 	
-	protected void redraw() {
-	    background.setColor(Color.WHITE);
-	    background.fillRect(0, 0, BOARDX, BOARDY + BUTTONY);
-	    background.setColor(Color.BLACK);
-	}
-	
 	private JPanel getButtonPanel() {
 		JPanel jpb = new JPanel();
 		jpb.setSize(BOARDX, BUTTONY);
-		ActionListener listener = new ActionListener() {
-						
+		ActionListener listener = new ActionListener() {						
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String action = e.getActionCommand();
@@ -193,10 +209,11 @@ public class Scene extends JFrame{
 					performMovement();
 	            } else if (action.equals(CLEAR_SCENE)) {
 	            	clearScreen();
+	            } else if (action.equals(PAUSE)) {
+	            	pause();
 	            }
 			}
-		};
-		
+		};		
 		entryX = new JTextField();
 		entryX.setColumns(5);
 		entryY = new JTextField();
@@ -210,8 +227,8 @@ public class Scene extends JFrame{
 		
 		addButton("Завърши обект", FINALIZE_OBJECT, listener, jpb);
 		addButton("Раздвижи!", PLAY_MOTION, listener, jpb);
+		addButton("Пауза", PAUSE, listener, jpb);
 		addButton("Изчисти!", CLEAR_SCENE, listener, jpb);
-
 		
 		return jpb;
 	}
@@ -226,6 +243,5 @@ public class Scene extends JFrame{
 	public static void main(String[] args) {
 		new Scene();	
 	}
-
 }
 

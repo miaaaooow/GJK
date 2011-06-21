@@ -14,8 +14,6 @@ import ui.Scene;
 
 public class MovableObject {
 	
-	private static int delta = 10;
-	
 	private int limitX;
 	private int limitY;
 	
@@ -23,8 +21,8 @@ public class MovableObject {
 	private int deltaY;
 	/* Boundaries relative to the visible part of the screen */
 	private int minX = Integer.MAX_VALUE;
-	private int minY = Integer.MIN_VALUE;
-	private int maxX = Integer.MAX_VALUE;
+	private int minY = Integer.MAX_VALUE;
+	private int maxX = Integer.MIN_VALUE;
 	private int maxY = Integer.MIN_VALUE;
 	
 	private Color color;
@@ -44,6 +42,8 @@ public class MovableObject {
 		else 
 			this.color = Color.BLACK;
 		
+		deltaX = dX;
+		deltaY = dY;
 		limitX = Scene.BOARDX;
 		limitY = Scene.BOARDY;
 		points = p;
@@ -58,6 +58,10 @@ public class MovableObject {
 	
 	public ArrayList<Point> getPoints() {
 		return this.points;
+	}
+	
+	public Color getColor () {
+		return this.color;
 	}
 	
 	private void turnX() {
@@ -79,7 +83,11 @@ public class MovableObject {
 		}
 	}
 	
+	/**
+	 * Recalculates the object's position on the scene
+	 */
 	public void move() {
+		ArrayList<Point> newPoints = new ArrayList<Point>();
 		Iterator<Point> it = points.iterator();
 		while (it.hasNext()) {
 			Point p = it.next();
@@ -87,16 +95,21 @@ public class MovableObject {
 			p.y += deltaY;
 			if (p.x < minX) 
 				minX = p.x; 
-			else if (p.x > maxX) 
+			if (p.x > maxX) 
 				maxX = p.x;
 			if (p.y < minY) 
 				minY = p.y;
-			else if (p.y > maxY) 
+			if (p.y > maxY) 
 				maxY = p.y;
+			newPoints.add(p);
 		}	
+		points = newPoints;
 		checkForDirectionUpdates();
 	}
 	
+	/**
+	 * Prevents the object from going out of the scene
+	 */
 	private void checkForDirectionUpdates () {
 		if (minX + deltaX < 0 || maxX + deltaX > limitX)
 			turnX();
@@ -108,7 +121,5 @@ public class MovableObject {
 	public String toString() {
 		return "Movable Object @[" + minX + ", " + minY + "] and deltas dX = " + deltaX + ", dY = " + deltaY; 
 	}
-	
-
-	
+		
 }

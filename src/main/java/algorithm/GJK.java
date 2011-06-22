@@ -10,7 +10,9 @@ import java.util.Iterator;
 public class GJK {
 	
 	/**
-	 * Searching for an intersection
+	 * Searching for an intersection between two objects
+	 * Relies on the fact that two objects intersect when their Minkowski difference covers the origin.
+	 * Explanation on: http://physics2d.com/content/gjk-algorithm
 	 * @param objectA
 	 * @param objectB
 	 * @return
@@ -64,8 +66,41 @@ public class GJK {
 	 * @param D2 - vector d's end
 	 * @return - the extreme point
 	 */
-	public static Point supportMapping (ArrayList<Point> convexHull, Point D1, Point D2) {
-		return null;
+	public static Point supportMapping (ArrayList<Point> convexHull, Point start, Point D1, Point D2) {
+		Iterator<Point> it = convexHull.iterator();
+		Point farthestPoint = null;
+		int farthestDistance = Integer.MIN_VALUE;
+		while (it.hasNext()) {
+			Point nextPoint = it.next();
+			int dist = MathTools.vectorDotProduct(start, nextPoint , D1, D2);
+			if (dist > farthestDistance) {
+				farthestDistance = dist;
+				farthestPoint = nextPoint;
+			}
+		}
+		return farthestPoint;
+	}
+	
+	/**
+	 * Some dummy tests
+	 */
+	public static void main(String[] args) {
+		Point A = new Point(2, 1);
+		Point B = new Point(3, 1);
+		Point C = new Point(5, 3);
+		Point D = new Point(4, 6);
+		Point E = new Point(2, 7);
+		Point F = new Point(1, 4);
+		ArrayList<Point> ap = new ArrayList<Point>(5);
+		ap.add(A);
+		ap.add(B);
+		ap.add(C);
+		ap.add(D);
+		ap.add(E);
+		
+		System.out.println(supportMapping(ap, F, C, A));
+		System.out.println(supportMapping(ap, F, A, B));
+		System.out.println(supportMapping(ap, E, D, C));
 	}
 
 }

@@ -45,7 +45,7 @@ public class Scene extends JFrame implements Runnable {
 	private final static int MAX_POINTS_NUMBER = 100;
 	
 	private final static int FRAME_TIME = 1000;
-	private final static int SLEEP_LONG = 100000;
+	//private final static int SLEEP_LONG = 100000;
 	
 	private final static String FINALIZE_OBJECT = "FIN OBJ";
 	private final static String PLAY_MOTION = "PLAY";
@@ -226,7 +226,7 @@ public class Scene extends JFrame implements Runnable {
 		addButton("Завърши обект", FINALIZE_OBJECT, listener, jpb);
 		addButton("Раздвижи!", PLAY_MOTION, listener, jpb);
 		addButton("Спри!", STOP, listener, jpb);
-		addButton("Изчисти!", CLEAR_SCENE, listener, jpb);
+		//addButton("Изчисти!", CLEAR_SCENE, listener, jpb);
 		
 		return jpb;
 	}

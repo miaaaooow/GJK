@@ -45,10 +45,11 @@ public class Scene extends JFrame implements Runnable {
 	private final static int MAX_POINTS_NUMBER = 100;
 	
 	private final static int FRAME_TIME = 1000;
+	private final static int SLEEP_LONG = 100000;
 	
 	private final static String FINALIZE_OBJECT = "FIN OBJ";
 	private final static String PLAY_MOTION = "PLAY";
-	private final static String PAUSE = "PAUSE";
+	private final static String STOP = "STOP";
 	private final static String CLEAR_SCENE = "CLEAR SCENE";
 	private final static Color [] colors = 
 			{Color.BLUE, Color.GREEN, Color.RED, Color.BLACK, Color.PINK, Color.ORANGE} ;
@@ -121,6 +122,9 @@ public class Scene extends JFrame implements Runnable {
 		// CONVEX HULL
 		MovableObject body = new MovableObject(points, dX, dY, colors[bodiesIndex % colors.length]);
 		bodies.add(body);
+		drawMovableObject(body);
+		repaint();
+		
 	    points = new Point [MAX_POINTS_NUMBER];
 	    pointIndex = 0;
 	    bodiesIndex++;
@@ -135,13 +139,13 @@ public class Scene extends JFrame implements Runnable {
 		Point prev = null;
 		if (it.hasNext()) {
 			Point first = it.next();
-			background.fillRect(first.x - POINT_SIZE/2, first.y + BUTTONY - POINT_SIZE/2, POINT_SIZE, POINT_SIZE);
+			background.fillRect(first.x - POINT_SIZE/2, first.y - POINT_SIZE/2, POINT_SIZE, POINT_SIZE);
 			prev = first;
 		}		
 		while (it.hasNext()) {
 			Point some = it.next();
-			background.fillRect(some.x - POINT_SIZE/2, some.y + BUTTONY - POINT_SIZE/2, POINT_SIZE, POINT_SIZE);	 
-			background.drawLine(prev.x, prev.y + BUTTONY, some.x, some.y + BUTTONY);
+			background.fillRect(some.x - POINT_SIZE/2, some.y  - POINT_SIZE/2, POINT_SIZE, POINT_SIZE);	 
+			background.drawLine(prev.x, prev.y, some.x, some.y);
 			prev = some;
 		}
 		System.out.println("draw movable end");
@@ -200,8 +204,8 @@ public class Scene extends JFrame implements Runnable {
 					thread.start();
 	            } else if (action.equals(CLEAR_SCENE)) {
 	            	clearScreen();
-	            } else if (action.equals(PAUSE)) {
-	            	thread.stop();          
+	            } else if (action.equals(STOP)) {
+	            	thread.stop();
 	            }
 			}
 		};		
@@ -218,7 +222,7 @@ public class Scene extends JFrame implements Runnable {
 		
 		addButton("Завърши обект", FINALIZE_OBJECT, listener, jpb);
 		addButton("Раздвижи!", PLAY_MOTION, listener, jpb);
-		addButton("Пауза", PAUSE, listener, jpb);
+		addButton("Спри!", STOP, listener, jpb);
 		addButton("Изчисти!", CLEAR_SCENE, listener, jpb);
 		
 		return jpb;
@@ -238,7 +242,7 @@ public class Scene extends JFrame implements Runnable {
 	public void start() {
 		thread = new Thread(this);
 	    thread.setPriority(Thread.MIN_PRIORITY);
-	    thread.start();
+	    thread.run();
 	}
 
 	public void stop() {

@@ -8,6 +8,12 @@ import java.util.Iterator;
 
 public class GJK {
 	
+	/**
+	 * Minkowski difference A(-)B
+	 * @param set1 = A
+	 * @param set2 = B
+	 * @return
+	 */
 	public static ArrayList<Point> MinkowskiDifference(ArrayList<Point> set1, ArrayList<Point> set2) {
 		
 		int size1 = set1.size();

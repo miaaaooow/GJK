@@ -29,6 +29,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import algorithm.ConvexHull;
+import algorithm.GJK;
+
 import geomobjects.MovableObject;
 import geomobjects.Point;
 
@@ -42,9 +45,10 @@ public class Scene extends JFrame implements Runnable {
 	public final static int BOARDY 		= 600;
 	private final static int BUTTONY 		= 60;
 	private final static int POINT_SIZE 	= 10;
-	private final static int MAX_POINTS_NUMBER = 100;
+	private final static int MAX_POINTS_NUMBER = 200;
+	private final static int MAX_BODIES_NUMBER = 10;
 	
-	private final static int FRAME_TIME = 1000;
+	private final static int FRAME_TIME = 700;
 	//private final static int SLEEP_LONG = 100000;
 	
 	private final static String FINALIZE_OBJECT = "FIN OBJ";
@@ -67,7 +71,7 @@ public class Scene extends JFrame implements Runnable {
 	private boolean startMode = true;
 	
 	private Point [] points = new Point [MAX_POINTS_NUMBER];
-	private ArrayList<MovableObject> bodies = new ArrayList<MovableObject>();
+	private MovableObject [] bodies = new MovableObject [MAX_BODIES_NUMBER];
 	private Thread thread;
 	
 	private int pointIndex; // the points index to be filled
@@ -113,15 +117,17 @@ public class Scene extends JFrame implements Runnable {
 		int dX, dY;
 		/*fix form **/ 
 		try {
-			dX = Integer.parseInt(entryX.getSelectedText());
-			dY = -1 * Integer.parseInt(entryY.getSelectedText());
+			dX = Integer.parseInt(entryX.getText());
+			dY = -1 * Integer.parseInt(entryY.getText());
 		} catch (NumberFormatException nfe) {
 			dX = 12; 
 			dY = 12;
 		}
+		entryX.setText("");
+		entryY.setText("");
 		// CONVEX HULL
 		MovableObject body = new MovableObject(points, dX, dY, colors[bodiesIndex % colors.length]);
-		bodies.add(body);
+		bodies[bodiesIndex] = body;
 		drawMovableObject(body);
 		repaint();
 		
@@ -161,7 +167,7 @@ public class Scene extends JFrame implements Runnable {
 	    repaint();
 	    points = new Point [MAX_POINTS_NUMBER];
 	    pointIndex = 0;
-	    bodies = new ArrayList<MovableObject>();	
+	    bodies = new MovableObject[MAX_BODIES_NUMBER];	
 	}
 
 	protected void redraw() {
@@ -257,13 +263,27 @@ public class Scene extends JFrame implements Runnable {
 	public void run() {
 	    Thread me = Thread.currentThread();
 	    while (thread == me) {
-	    	Iterator<MovableObject> it = bodies.iterator();
-			while (it.hasNext()) {
-				MovableObject mo = it.next();
-				System.out.println(mo.toString());
-				mo.move();
-				drawMovableObject(mo);
-			}
+	    	if (bodiesIndex > 0) {
+		    	for (int i = 0;i < bodiesIndex; i++) {
+		    		for (int j = i + 1; j < bodiesIndex; j++) {
+		    			if(GJK.findIntersection(bodies[i], bodies[j])) {
+		    				bodies[i].setIntersected(true);
+		    				bodies[j].setIntersected(true);
+		    			}
+		    			else {
+		    				bodies[i].setIntersected(false);
+		    				bodies[j].setIntersected(false);
+		    			}
+		    		
+		    		}
+		    	}
+		    	for (int i = 0; i<bodiesIndex; i++) {
+		    		MovableObject mo = bodies[i];
+		    		System.out.println(mo.toString());
+					mo.move();
+					drawMovableObject(mo);
+		    	}
+	    	}
 			try {
 				Thread.sleep(FRAME_TIME);
 			} catch (InterruptedException ie) {

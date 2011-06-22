@@ -5,6 +5,7 @@ import geomobjects.PointComparator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 
 public class ConvexHull {
@@ -18,6 +19,7 @@ public class ConvexHull {
 	
 	public static Point [] findConvexHull(Point [] points) {
 		int size = 0;
+		//while (size < points.length && points[size] != null) {
 		while (points[size] != null) {
 			size++;
 		}
@@ -49,7 +51,7 @@ public class ConvexHull {
 				convexHull[0] = points[minIndex]; 	//the first real point
 				points[minIndex] = points[0];		//swap not to lose information
 				points[0] = convexHull[0];			
-				points[size] = points[0];		//close the points hull
+				points[size] = points[0];		    //close the points hull
 				
 				Arrays.sort(points, 1, size, comparator);
 				
@@ -76,9 +78,15 @@ public class ConvexHull {
 	}
 	
 	public static ArrayList<Point> findConvexHull(ArrayList<Point> entrySet) {
-		Point [] p = (Point[]) entrySet.toArray();
+		Iterator<Point> it = entrySet.iterator();
+		Point [] p = new Point [entrySet.size() + 1];
+		int i = 0;
+		while(it.hasNext()) {
+			p[i] = it.next();
+			i++;
+		}
 		Point [] result = findConvexHull(p);
-		ArrayList<Point> al = new ArrayList<Point>(result.length);
+		ArrayList<Point> al = new ArrayList<Point>();
 		for (Point q : result) {
 			al.add(q);
 		}

@@ -6,8 +6,11 @@ import geomobjects.Point;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 public class GJK {
+	
+	private final static Point THE_ORIGIN = new Point(0,0);
 	
 	/**
 	 * Searching for an intersection between two objects
@@ -23,6 +26,38 @@ public class GJK {
 		ArrayList<Point> minkowski = 
 			MinkowskiDifference((ArrayList<Point>)points1.subList(0, points1.size() - 1), 
 								(ArrayList<Point>)points2.subList(0, points2.size() - 1));
+		/** We take only the convex hull for farthest points calculations **/
+		ArrayList<Point> MinConvHull = ConvexHull.findConvexHull(minkowski);
+		
+		ArrayList<Point> simplex = new ArrayList<Point>(3);
+		
+		Random rand = new Random();
+	
+		/** 
+		 * 0 - simplex
+		 */
+		int size = minkowski.size();
+		// We take a random point from the Minkowski Diff
+		Point P = minkowski.get(rand.nextInt(size)); 
+		Point A = supportMapping(MinConvHull, P, P, THE_ORIGIN);
+		
+		// The "farthest" point on the origin direction is farther from the origin
+		if (MathTools.distAB(THE_ORIGIN, P) < MathTools.distAB(THE_ORIGIN, A)) {
+			return false;
+		}
+		
+		// a.d < 0
+		if (MathTools.vectorDotProduct(THE_ORIGIN, A, P, THE_ORIGIN) < 0) {
+			return false;
+		}
+		
+		simplex.add(A);
+		
+		
+		/**
+		 * 1 - simplex
+		 */
+		
 		
 		
 		return false;

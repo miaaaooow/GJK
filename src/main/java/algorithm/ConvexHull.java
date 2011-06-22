@@ -2,8 +2,9 @@ package algorithm;
 
 import geomobjects.Point;
 import geomobjects.PointComparator;
-import java.util.Arrays;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class ConvexHull {
@@ -74,6 +75,15 @@ public class ConvexHull {
 		}		
 	}
 	
+	public static ArrayList<Point> findConvexHull(ArrayList<Point> entrySet) {
+		Point [] p = (Point[]) entrySet.toArray();
+		Point [] result = findConvexHull(p);
+		ArrayList<Point> al = new ArrayList<Point>(result.length);
+		for (Point q : result) {
+			al.add(q);
+		}
+		return al;		
+	}
 
 	public static int leftTurn(Point m1, Point m2, Point m3) {		
 		return (m2.x - m1.x) * (m3.y - m1.y) - (m2.y - m1.y) * (m3.x - m1.x);

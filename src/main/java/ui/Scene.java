@@ -52,7 +52,8 @@ public class Scene extends JFrame implements Runnable {
 	private final static String STOP = "STOP";
 	private final static String CLEAR_SCENE = "CLEAR SCENE";
 	private final static Color [] colors = 
-			{Color.BLUE, Color.GREEN, Color.RED, Color.BLACK, Color.PINK, Color.ORANGE} ;
+			{Color.BLUE, Color.GREEN, Color.MAGENTA, Color.GRAY, Color.PINK, Color.ORANGE} ;
+	private final static Color INTERSECTED = Color.RED;
 
 	
 	/** private fields **/
@@ -109,16 +110,15 @@ public class Scene extends JFrame implements Runnable {
 	
 	
 	public void finalizeObject(String object){
-		int dX = 12;
-		int dY = 12;
-		/** @TODO - fix form **/ 
-//		try {
-//			dX = Integer.parseInt(entryX.getSelectedText());
-//			dY = Integer.parseInt(entryY.getSelectedText());
-//		} catch (NumberFormatException nfe) {
-//			dX = 120; 
-//			dY = 120;
-//		}
+		int dX, dY;
+		/*fix form **/ 
+		try {
+			dX = Integer.parseInt(entryX.getSelectedText());
+			dY = -1 * Integer.parseInt(entryY.getSelectedText());
+		} catch (NumberFormatException nfe) {
+			dX = 12; 
+			dY = 12;
+		}
 		// CONVEX HULL
 		MovableObject body = new MovableObject(points, dX, dY, colors[bodiesIndex % colors.length]);
 		bodies.add(body);
@@ -133,7 +133,11 @@ public class Scene extends JFrame implements Runnable {
 	
 	
 	private void drawMovableObject(MovableObject mo) {
-		background.setColor(mo.getColor());
+		if (mo.isIntersected()){
+			background.setColor(INTERSECTED);
+		} else {
+			background.setColor(mo.getColor());
+		}
 		ArrayList<Point> ap = mo.points;
 		Iterator<Point> it = ap.iterator();
 		Point prev = null;
@@ -148,7 +152,6 @@ public class Scene extends JFrame implements Runnable {
 			background.drawLine(prev.x, prev.y, some.x, some.y);
 			prev = some;
 		}
-		System.out.println("draw movable end");
 	}
 	
 	

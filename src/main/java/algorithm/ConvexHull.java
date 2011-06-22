@@ -78,23 +78,7 @@ public class ConvexHull {
 	public static int leftTurn(Point m1, Point m2, Point m3) {		
 		return (m2.x - m1.x) * (m3.y - m1.y) - (m2.y - m1.y) * (m3.x - m1.x);
 	}
-		
-	/**
-	 * AB x AC
-	 */	
-	public static double vectorMultiplication(Point A, Point B, Point C) {
-		double AB = distAB(A, B);
-		double BC = distAB(B, C);
-		double CA = distAB(C, A);
-		double p = (AB + BC + CA) / 2;
-		double Sabc = Math.sqrt(p * (p - AB) * (p - BC) * (p - CA));
-		return Sabc * 2;	
-	}
 	
-	
-	public static double distAB(Point A, Point B) {
-		return Math.sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
-	}
 	
 
 }

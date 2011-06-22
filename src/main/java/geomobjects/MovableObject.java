@@ -28,6 +28,7 @@ public class MovableObject {
 	private int maxY = Integer.MIN_VALUE;
 	
 	private Color color;
+	private boolean intersected;
 	
 	public ArrayList<Point> points;
 
@@ -61,6 +62,14 @@ public class MovableObject {
 	
 	public Color getColor () {
 		return this.color;
+	}
+	
+	public boolean isIntersected() {
+		return intersected;
+	}
+
+	public void setIntersected(boolean intersected) {
+		this.intersected = intersected;
 	}
 	
 	private void turnX() {

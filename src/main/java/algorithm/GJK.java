@@ -1,12 +1,30 @@
 package algorithm;
 
 
+import geomobjects.MovableObject;
 import geomobjects.Point;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class GJK {
+	
+	/**
+	 * Searching for an intersection
+	 * @param objectA
+	 * @param objectB
+	 * @return
+	 */
+	public static boolean findIntersection(MovableObject objectA, MovableObject objectB) {
+		ArrayList<Point> points1 = objectA.getPoints();
+		ArrayList<Point> points2 = objectB.getPoints();
+		ArrayList<Point> minkowski = 
+			MinkowskiDifference((ArrayList<Point>)points1.subList(0, points1.size() - 1), 
+								(ArrayList<Point>)points2.subList(0, points2.size() - 1));
+		
+		
+		return false;
+	}
 	
 	/**
 	 * Minkowski difference A(-)B
@@ -37,6 +55,17 @@ public class GJK {
 			}			
 			return result;
 		}	
+	}
+	
+	/**
+	 * This function finds a supporting(Extreme) point of a movable object in direction d = D1D2.
+	 * @param convexHull - the list of points to be checked
+	 * @param D1 - vector d's beginning
+	 * @param D2 - vector d's end
+	 * @return - the extreme point
+	 */
+	public static Point supportMapping (ArrayList<Point> convexHull, Point D1, Point D2) {
+		return null;
 	}
 
 }
